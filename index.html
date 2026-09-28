@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitLog - Simple Tracker</title>
+    <style>
+        /* 
+           Simple styling to make the website look clean and modern.
+           We use basic colors and spacing.
+        */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            max-width: 600px; /* Keeps the website narrow and easy to read */
+            margin: 0 auto; /* Centers the content */
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        /* The 'card' class creates nice white boxes for our forms */
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding doesn't make inputs too wide */
+        }
+
+        button {
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Slightly darker blue when you hover */
+        }
+
+        .summary-text {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        /* Colors for our numbers */
+        .positive { color: #27ae60; font-weight: bold; } /* Green */
+        .negative { color: #e74c3c; font-weight: bold; } /* Red */
+    </style>
+</head>
+<body>
+
+    <h1>FitLog</h1>
+    <p style="text-align: center;">A very simple tracker for your workouts and meals.</p>
+
+    <!-- SECTION 1: Logging a Workout -->
+    <div class="card">
+        <h2>🏋️ Log a Workout</h2>
+        
+        <label for="workoutName">Workout Name:</label>
+        <input type="text" id="workoutName" placeholder="e.g., Morning Run">
+
+        <label for="caloriesBurnt">Calories Burnt:</label>
+        <input type="number" id="caloriesBurnt" placeholder="e.g., 300" min="0">
+
+        <button onclick="saveWorkout()">Save Workout</button>
+    </div>
+
+    <!-- SECTION 2: Logging a Meal -->
+    <div class="card">
+        <h2>🍔 Log a Meal</h2>
+        
+        <label for="foodName">Food Item:</label>
+        <input type="text" id="foodName" placeholder="e.g., Salad">
+
+        <label for="caloriesConsumed">Calories Consumed:</label>
+        <input type="number" id="caloriesConsumed" placeholder="e.g., 250" min="0">
+
+        <button onclick="saveMeal()">Save Meal</button>
+    </div>
+
+    <!-- SECTION 3: Daily Summary -->
+    <div class="card">
+        <h2>📊 Daily Summary</h2>
+        
+        <p class="summary-text">Total Calories Consumed: <span id="totalConsumedDisplay" class="negative">0</span> kcal</p>
+        <p class="summary-text">Total Calories Burnt: <span id="totalBurntDisplay" class="positive">0</span> kcal</p>
+        
+        <hr>
+        
+        <p class="summary-text"><strong>Net Calories: <span id="netCaloriesDisplay">0</span> kcal</strong></p>
+    </div>
+
+    <!-- 
+       JavaScript adds behavior to our website. 
+       It does the math and updates the numbers on the screen.
+    -->
+    <script>
+        // These variables act as our computer's memory for this page
+        let totalConsumed = 0;
+        let totalBurnt = 0;
+
+        // This function runs when the "Save Workout" button is clicked
+        function saveWorkout() {
+            // Get the value typed into the calories burnt input box
+            let burntInput = document.getElementById("caloriesBurnt").value;
+            
+            // Convert the text into a number
+            let burntNumber = Number(burntInput);
+
+            // Business Rule: Check if the number is valid and greater than 0
+            if (burntNumber > 0) {
+                totalBurnt = totalBurnt + burntNumber; // Add to our total
+                
+                // Clear the input boxes
+                document.getElementById("workoutName").value = "";
+                document.getElementById("caloriesBurnt").value = "";
+                
+                // Update the screen and alert the user
+                updateScreen();
+                alert("Workout saved successfully!");
+            } else {
+                alert("Please enter a valid positive number for calories burnt.");
+            }
+        }
+
+        // This function runs when the "Save Meal" button is clicked
+        function saveMeal() {
+            // Get the value typed into the calories consumed input box
+            let consumedInput = document.getElementById("caloriesConsumed").value;
+            
+            // Convert the text into a number
+            let consumedNumber = Number(consumedInput);
+
+            // Business Rule: Check if the number is valid and greater than 0
+            if (consumedNumber > 0) {
+                totalConsumed = totalConsumed + consumedNumber; // Add to our total
+                
+                // Clear the input boxes
+                document.getElementById("foodName").value = "";
+                document.getElementById("caloriesConsumed").value = "";
+                
+                // Update the screen and alert the user
+                updateScreen();
+                alert("Meal saved successfully!");
+            } else {
+                alert("Please enter a valid positive number for calories consumed.");
+            }
+        }
+
+        // This function calculates the net calories and updates the text on the page
+        function updateScreen() {
+            // Update the basic totals
+            document.getElementById("totalConsumedDisplay").innerText = totalConsumed;
+            document.getElementById("totalBurntDisplay").innerText = totalBurnt;
+
+            // Calculate the net difference
+            let netCalories = totalConsumed - totalBurnt;
+            document.getElementById("netCaloriesDisplay").innerText = netCalories;
+        }
+    </script>
+
+</body>
+</html>

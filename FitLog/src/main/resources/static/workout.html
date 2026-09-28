@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FitLog - Log Workout</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; background: #f4f7f6; height: 100vh; overflow: hidden; }
+        .sidebar { width: 220px; background: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar h2 { text-align: center; margin-top: 0; }
+        .sidebar a { color: white; text-decoration: none; padding: 12px; border-radius: 5px; background: #34495e; text-align: center; font-weight: bold; }
+        .sidebar a:hover { background: #1abc9c; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; margin-top: 50px;}
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; background-color: #3498db; color: white; border: none; padding: 12px; margin-top: 15px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>FitLog</h2>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="activity.html">📅 Daily Activity</a>
+        <a href="workout.html">🏋️ Log Workout</a>
+        <a href="meal.html">🍔 Log Meal</a>
+        <a href="goal.html">🎯 Set Goal</a>
+    </div>
+    
+    <div class="main-content">
+        <div class="card">
+            <h2>🏋️ Log a New Workout</h2>
+            <label>Workout Name:</label>
+            <input type="text" id="workoutName" placeholder="e.g., Morning Run">
+            <label>Duration (mins):</label>
+            <input type="number" id="workoutDuration" min="1">
+            <label>Calories Burnt:</label>
+            <input type="number" id="caloriesBurnt" min="0">
+            <button onclick="saveWorkout()">Save Workout</button>
+        </div>
+    </div>
+
+    <script>
+        function saveWorkout() {
+            let data = {
+                type: document.getElementById('workoutName').value,
+                duration: document.getElementById('workoutDuration').value,
+                caloriesBurnt: document.getElementById('caloriesBurnt').value
+            };
+            fetch('/api/workouts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+            .then(async response => {
+                if(response.ok) { alert("Saved!"); window.location.href = "activity.html"; }
+                else { alert(await response.text()); }
+            });
+        }
+    </script>
+</body>
+</html>

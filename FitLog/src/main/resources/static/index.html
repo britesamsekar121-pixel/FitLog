@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FitLog - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; background: #f4f7f6; height: 100vh; overflow: hidden; }
+        .sidebar { width: 220px; background: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar h2 { text-align: center; margin-top: 0; }
+        .sidebar a { color: white; text-decoration: none; padding: 12px; border-radius: 5px; background: #34495e; text-align: center; font-weight: bold; }
+        .sidebar a:hover { background: #1abc9c; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .chart-container { width: 100%; max-width: 600px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>FitLog</h2>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="activity.html">📅 Daily Activity</a>
+        <a href="workout.html">🏋️ Log Workout</a>
+        <a href="meal.html">🍔 Log Meal</a>
+        <a href="goal.html">🎯 Set Goal</a>
+    </div>
+    
+    <div class="main-content">
+        <h1>Dashboard</h1>
+        
+        <div class="card" id="goalMessageCard" style="background: #e8f8f5; border-left: 5px solid #1abc9c;">
+            <h3>🎯 Weekly Goal Progress</h3>
+            <p id="goalText" style="font-size: 1.1em; font-weight: bold;">Loading goal...</p>
+        </div>
+
+        <div class="card">
+            <h3>📈 Calories Overview (Daily vs Weekly)</h3>
+            <div class="chart-container">
+                <canvas id="caloriesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            fetch('/api/summary/daily').then(r => r.json()).then(daily => {
+                fetch('/api/summary/weekly').then(r => r.json()).then(weekly => {
+                    
+                    // Goal Logic Reminder
+                    let goalText = "You haven't set a weekly workout goal yet!";
+                    if (daily.latestGoal) {
+                        let target = daily.latestGoal.targetWorkouts;
+                        let completed = weekly.workoutsLast7Days;
+                        let remaining = target - completed;
+                        let reason = daily.latestGoal.reason ? ` <br><br><i>Motivation: "${daily.latestGoal.reason}"</i>` : "";
+                        
+                        if (remaining > 0) {
+                            goalText = `You have completed ${completed} out of ${target} workouts this week. You need ${remaining} more to reach your goal! Keep pushing! ${reason}`;
+                        } else {
+                            goalText = `🎉 Congratulations! You reached your goal of ${target} workouts this week! Amazing job! ${reason}`;
+                        }
+                    }
+                    document.getElementById('goalText').innerHTML = goalText;
+
+                    // Chart Logic
+                    const ctx = document.getElementById('caloriesChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Daily Stats', 'Weekly Stats'],
+                            datasets: [
+                                {
+                                    label: 'Calories In',
+                                    data: [daily.caloriesConsumed, weekly.weeklyCaloriesConsumed],
+                                    backgroundColor: '#e74c3c'
+                                },
+                                {
+                                    label: 'Calories Out',
+                                    data: [daily.caloriesBurnt, weekly.weeklyCaloriesBurnt],
+                                    backgroundColor: '#27ae60'
+                                },
+                                {
+                                    label: 'Net Calories',
+                                    data: [daily.netCalories, weekly.weeklyNetCalories],
+                                    backgroundColor: '#3498db'
+                                }
+                            ]
+                        },
+                        options: { responsive: true }
+                    });
+                });
+            });
+        };
+    </script>
+</body>
+</html>

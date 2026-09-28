@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FitLog - Daily Activity</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; background: #f4f7f6; height: 100vh; overflow: hidden; }
+        .sidebar { width: 220px; background: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar h2 { text-align: center; margin-top: 0; }
+        .sidebar a { color: white; text-decoration: none; padding: 12px; border-radius: 5px; background: #34495e; text-align: center; font-weight: bold; }
+        .sidebar a:hover { background: #1abc9c; }
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 12px; border-bottom: 1px solid #eee; }
+        li:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>FitLog</h2>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="activity.html">📅 Daily Activity</a>
+        <a href="workout.html">🏋️ Log Workout</a>
+        <a href="meal.html">🍔 Log Meal</a>
+        <a href="goal.html">🎯 Set Goal</a>
+    </div>
+    
+    <div class="main-content">
+        <h1>Today's Activity log</h1>
+        
+        <div class="card">
+            <h3>🏋️ Workouts Done Today</h3>
+            <ul id="workoutList">Loading...</ul>
+        </div>
+
+        <div class="card">
+            <h3>🍔 Meals Eaten Today</h3>
+            <ul id="mealList">Loading...</ul>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            fetch('/api/summary/daily').then(r => r.json()).then(data => {
+                const wList = document.getElementById('workoutList');
+                wList.innerHTML = '';
+                if (data.todayWorkouts.length === 0) wList.innerHTML = '<li>No workouts logged today.</li>';
+                data.todayWorkouts.forEach(w => {
+                    wList.innerHTML += `<li><strong>${w.type}</strong> - ${w.duration} mins (${w.caloriesBurnt} kcal burnt)</li>`;
+                });
+
+                const mList = document.getElementById('mealList');
+                mList.innerHTML = '';
+                if (data.todayMeals.length === 0) mList.innerHTML = '<li>No meals logged today.</li>';
+                data.todayMeals.forEach(m => {
+                    mList.innerHTML += `<li><strong>${m.foodItem}</strong> - ${m.quantity} items/servings (${m.calories} kcal total)</li>`;
+                });
+            });
+        };
+    </script>
+</body>
+</html>
